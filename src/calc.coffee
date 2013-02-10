@@ -1,25 +1,28 @@
+root = exports ? this
+
 #Class to contain a row's data and perform operations.
-class @CalculationRow
+class root.CalculationRow
   constructor: (@lineNumber, @operator, @values) ->
   calculate: () ->
     switch(@operator)
-      when "SUM" then go sum
-      when "MIN" then go min
-      when "MAX" then go max
-      when "AVERAGE" then go average
+      when "SUM" then @sum()
+      when "MIN" then @min()
+      when "MAX" then @max()
+      when "AVERAGE" then @average()
+#      else -1
 
   sum: () ->
-    return @values.reduce(t, s) -> t + s
+    return (@values.reduce (t, s) -> t + s)
   min: () ->
-    return @values.reduce(t, s) -> Math.min(t, s)
+    Math.min.apply(this, @values)
   max: () ->
-    return @values.reduce(t, s) -> Math.max(t, s)
+    Math.max.apply(this, @values)
   average: () ->
-    return (@values.reduce(t, s, 0) -> t += s) / @values.length
+    Math.round((@values.reduce (t, s) -> t += s) / @values.length)
 
 
 #Sets text to uppercase and tries to validate the input pattern.
-@validateInput = (inputString) -> 
+root.validateInput = (inputString) -> 
   validRegex = /// (
     \d\#-        #Starting number followed by #-
     (\bSUM\b     #The SUM operator
@@ -33,11 +36,11 @@ class @CalculationRow
   return (!!inputString && validRegex.test(inputString.toUpperCase()))
 
 #Removes the whitespace and changes string to uppercase.
-@stripWhiteSpaceAndChangeToUpper = (inputString) ->
+root.stripWhiteSpaceAndChangeToUpper = (inputString) ->
   return inputString.replace /^\s+|s+$/g, ""
 
 #The linebreak regex is from: www.unicode.org.
-@parseInputText = (inputString) ->
+root.parseInputText = (inputString) ->
   rows = inputString.match(/\r\n|[\n\v\f\r\x85\u2028\u2029]/)
   
   
