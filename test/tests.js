@@ -8,14 +8,99 @@ test( "Single row input tests", function() {
     "1#-SUM:1,2,3",
     "1#-SUM: 1,2,3",
     "1#-SUM: 1, 2, 3",
-    "1#-SUM: 1 , 2 , 3 "
+    "1#-SUM: 1 , 2 , 3 ",
+    " 1 # - SUM : 1 , 2 , 3 "
   ];
   
   for(var i = 0; i < validInputs.length; i++) 
     ok( validateInput(validInputs[i]) == true, "Passed!" );
 });
 
-test( "Performance test", function() {  
+test( "SUM operation", function() {  
+  var result = calculate("SUM", [1, 2, 3, 4]);
+  ok( result == 10, "Passed! [ Expected 10, was " + result + "]");
+});
+
+test( "MIN operation", function() {  
+  var result = calculate("MIN", [1, 2, 3, 4]);
+  ok( result == 1, "Passed! [ Expected 1, was " + result + "]");
+});
+
+test( "MAX operation", function() {  
+  var result = calculate("MAX", [1, 2, 3, 4]);
+  ok( result == 4, "Passed! [ Expected 4, was " + result + "]");
+});
+
+test( "AVERAGE operation - round up", function() {  
+  var result = calculate("AVERAGE", [1, 2, 3, 4]);
+  ok( result == 3, "Passed! [ Expected 3, was " + result + "]");
+});
+
+test( "AVERAGE operation - round down", function() {  
+  var result = calculate("AVERAGE", [2, 3, 5]);
+  ok( result == 3, "Passed! [ Expected 3, was " + result + "]");
+});
+
+test( "Invalid operation - round down", function() {  
+  var result = calculate("AVG", [2, 3, 5]);
+  ok( result == -1, "Passed! [ Expected -1, was " + result + "]");
+});
+
+test( "Remove whitespace and set to upper", function() {
+  var result = stripWhiteSpaceAndChangeToUpper("  1 # -	SUM : 1 , 2 , 3 , 4 ");
+  var expected = "1#-SUM:1,2,3,4";  
+  ok( result == expected, 
+    "Passed! [Expected: " + expected + ", was " + result);
+});
+
+test( "Split row", function() {
+  var result = splitRow("1#-SUM:1,2,3");
+  var expected = new CalculateRow(1, "SUM", "1,2,3");
+  ok ( result.lineNumber == expected.lineNumber, 
+    "Passed! [Expected: " + expected.lineNumber + ", was " + result.lineNumber + "]");
+  ok ( result.operator == expected.operator, 
+    "Passed! [Expected: " + expected.operator.length + ", was " + result.operator.length + "]");
+  ok ( result.values.length == expected.values.length, 
+    "Passed! [Expected: " + expected.values + ", was " + result.values + "]");
+  ok ( result.values[0] == expected.values[0], 
+    "Passed! [Expected: " + expected.values[0] + ", was " + result.values[0] + "]");
+  ok ( result.values[1] == expected.values[1], 
+    "Passed! [Expected: " + expected.values[1] + ", was " + result.values[1] + "]");
+  ok ( result.values[2] == expected.values[2], 
+    "Passed! [Expected: " + expected.values[2] + ", was " + result.values[2] + "]");
+});
+
+test( "Parse single row", function() {
+  var result = parseRow("1#-SUM:1,2,3,4");
+  var expected = "1#:SUM=10";
+  ok( result == expected, "Passed! [Expected: " + expected + ", was " + result + "]");
+});
+
+test( "Parse single row fail", function() {
+  var result = parseRow("1#-AVG:1,2,3,4");
+  var expected = "Could not parse. [ 1#-AVG:1,2,3,4 ]";
+  ok( result == expected, "Passed! [Expected: " + expected + ", was " + result + "]");
+});
+
+test( "Parse rows", function() {
+  var result = parseInputText("1#-SUM:1,2,3,4" + "\r\n" + "2#-SUM:4,4,4,4" + "\r\n" + "3#-SUM:3,4,5,6");
+  var expected = "1#:SUM=10" + "\r\n" + "2#:SUM=16" + "\r\n" + "3#:SUM=18";
+  ok( result == expected, "Passed! [Expected: " + expected + ", was " + result + "]");
+});
+
+test( "Parse rows fail", function() {
+  var result = parseInputText("1#-SUM:1,2,3,4" + "\r\n" + "2#-AVG:1,2,3,4" + "\r\n" + "3#-SUM:3,4,5,6");
+  var expected = "1#:SUM=10" + "\r\n" + "Could not parse. [ 2#-AVG:1,2,3,4 ]" + "\r\n" + "3#:SUM=18";
+  ok( result == expected, "Passed! [Expected: " + expected + ", was " + result + "]");
+});
+
+test( "Garbage input", function() {
+  var result = parseInputText("asdfsd23432f:asdf:Adsf");
+  var expected = "Could not parse. [ asdfsd23432f:asdf:Adsf ]";
+  ok( result == expected, "Passed! [Expected: " + expected + ", was " + result + "]");
+});
+
+test( "Performance test - RegEx", function() {  
   var startTime = new Date().getTime();
 
   var iterations = 100000;
@@ -24,42 +109,10 @@ test( "Performance test", function() {
 
   var endTime = new Date().getTime();
   var duration = (endTime - startTime);
-  ok( (duration < 100), "Passed!");
+  ok( (duration < 100), "Passed! [Iterations: " + iterations + " - " + duration + "ms ]");
 });
 
-test( "SUM operation", function() {  
-  var inputRow = new CalculationRow(1, "SUM", [1, 2, 3, 4]);
-  var result = inputRow.calculate();
-  ok( result == 10, "Passed! [ Expected 10, was " + result + "]");
-});
-
-test( "MIN operation", function() {  
-  var inputRow = new CalculationRow(1, "MIN", [1, 2, 3, 4]);
-  var result = inputRow.calculate();
-  ok( result == 1, "Passed! [ Expected 1, was " + result + "]");
-});
-
-test( "MAX operation", function() {  
-  var inputRow = new CalculationRow(1, "MAX", [1, 2, 3, 4]);
-  var result = inputRow.calculate();
-  ok( result == 4, "Passed! [ Expected 4, was " + result + "]");
-});
-
-test( "AVERAGE operation - round up", function() {  
-  var inputRow = new CalculationRow(1, "AVERAGE", [1, 2, 3, 4]);
-  var result = inputRow.calculate();
-  ok( result == 3, "Passed! [ Expected 3, was " + result + "]");
-});
-
-test( "AVERAGE operation - round down", function() {  
-  var inputRow = new CalculationRow(1, "AVERAGE", [2, 3, 5]);
-  var result = inputRow.calculate();
-  ok( result == 3, "Passed! [ Expected 3, was " + result + "]");
-});
-
-/*
-Results: append: 9ms, reduce 25ms
-test( "Test speed Reduce vs Apply", function() {  
+test( "Performance test - Reduce vs Apply", function() {  
 
   var values = [];
   var iterations = 100000;
@@ -81,7 +134,8 @@ test( "Test speed Reduce vs Apply", function() {
 
   ok( rMin == aMin, "Passed! [Reduce: " + rDuration + "ms, Apply: " + aDuration + "ms]");
 });
-*/
+
+
 
 /*
 test( "", function() {  

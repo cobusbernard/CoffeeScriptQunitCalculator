@@ -4,64 +4,84 @@
 
   root = typeof exports !== "undefined" && exports !== null ? exports : this;
 
-  root.CalculationRow = (function() {
+  root.CalculateRow = (function() {
 
-    function CalculationRow(lineNumber, operator, values) {
+    function CalculateRow(lineNumber, operator, values) {
       this.lineNumber = lineNumber;
       this.operator = operator;
-      this.values = values;
+      this.values = values.split(",");
     }
 
-    CalculationRow.prototype.calculate = function() {
-      switch (this.operator) {
-        case "SUM":
-          return this.sum();
-        case "MIN":
-          return this.min();
-        case "MAX":
-          return this.max();
-        case "AVERAGE":
-          return this.average();
-      }
-    };
-
-    CalculationRow.prototype.sum = function() {
-      return this.values.reduce(function(t, s) {
-        return t + s;
-      });
-    };
-
-    CalculationRow.prototype.min = function() {
-      return Math.min.apply(this, this.values);
-    };
-
-    CalculationRow.prototype.max = function() {
-      return Math.max.apply(this, this.values);
-    };
-
-    CalculationRow.prototype.average = function() {
-      return Math.round((this.values.reduce(function(t, s) {
-        return t += s;
-      })) / this.values.length);
-    };
-
-    return CalculationRow;
+    return CalculateRow;
 
   })();
 
   root.validateInput = function(inputString) {
     var validRegex;
-    validRegex = /(\d\#-(\bSUM\b|\bAVERAGE\b|\bMIN\b|\bMAX\b):(\s*\d+)(,\s*\d+\s*)*)/;
+    validRegex = /(\s*\d\s*\#\s*-\s*(\bSUM\b|\bAVERAGE\b|\bMIN\b|\bMAX\b)\s*:(\s*\d+)(,\s*\d+\s*)*)/;
     return !!inputString && validRegex.test(inputString.toUpperCase());
   };
 
   root.stripWhiteSpaceAndChangeToUpper = function(inputString) {
-    return inputString.replace(/^\s+|s+$/g, "");
+    return inputString.replace(/\s+|s+$/g, "");
+  };
+
+  root.calculate = function(operator, values) {
+    switch (operator) {
+      case "SUM":
+        return values.reduce(function(t, s) {
+          return +t + +s;
+        });
+      case "MIN":
+        return Math.min.apply(this, values);
+      case "MAX":
+        return Math.max.apply(this, values);
+      case "AVERAGE":
+        return Math.round((values.reduce(function(t, s) {
+          return t += s;
+        })) / values.length);
+      default:
+        return -1;
+    }
+  };
+
+  root.buildOutput = function(lineNumber, operator, result) {
+    return "" + lineNumber + "#:" + operator + "=" + result;
+  };
+
+  root.splitRow = function(row) {
+    var lineNumber, operator, operatorValues, result, values, _ref, _ref1;
+    _ref = (stripWhiteSpaceAndChangeToUpper(row)).split("#-"), lineNumber = _ref[0], operatorValues = _ref[1];
+    _ref1 = operatorValues.split(":"), operator = _ref1[0], values = _ref1[1];
+    result = new CalculateRow(lineNumber, operator, values);
+    return result;
+  };
+
+  root.parseRow = function(row) {
+    var calcRow, result;
+    if (validateInput(row)) {
+      calcRow = splitRow(row);
+      result = calculate(calcRow.operator, calcRow.values);
+      return buildOutput(calcRow.lineNumber, calcRow.operator, result);
+    } else {
+      return "Could not parse. [ " + row + " ]";
+    }
   };
 
   root.parseInputText = function(inputString) {
-    var rows;
-    return rows = inputString.match(/\r\n|[\n\v\f\r\x85\u2028\u2029]/);
+    var output, row, rows;
+    rows = inputString.split(/\r\n|[\n\v\f\r\x85\u2028\u2029]/);
+    return output = ((function() {
+      var _i, _len, _results;
+      _results = [];
+      for (_i = 0, _len = rows.length; _i < _len; _i++) {
+        row = rows[_i];
+        _results.push(parseRow(row));
+      }
+      return _results;
+    })()).reduce(function(t, s) {
+      return t + "\r\n" + s;
+    });
   };
 
 }).call(this);
