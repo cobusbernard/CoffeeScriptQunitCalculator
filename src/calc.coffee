@@ -24,7 +24,7 @@ root.validateInput = (inputString) ->
 
 #Removes the whitespace and changes string to uppercase.
 root.stripWhiteSpaceAndChangeToUpper = (inputString) ->
-  return (inputString.replace /\s+|s+$/g, "").replace /\b\#([^a-zA-Z])?\b/g, "#"
+  return (inputString.replace /\s+|s+$/g, "").toUpperCase().replace /\b\#([^a-zA-Z])?\b/g, "#"
 
 #Calculates the result based on operator and input values
 root.calculate = (operator, values) ->

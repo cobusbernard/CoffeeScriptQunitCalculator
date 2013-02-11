@@ -9,6 +9,9 @@ appFiles  = [
 task 'build', 'Build single application file from source files', ->
   console.log 'Build start ...'
   appContents = new Array remaining = appFiles.length
+  exec 'cp src/calc.html build/', (err, stdout, stderr) ->
+    throw err if err
+    console.log stdout + stderr
   for file, index in appFiles then do (file, index) ->
     fs.readFile "src/#{file}.coffee", 'utf8', (err, fileContents) ->
       throw err if err

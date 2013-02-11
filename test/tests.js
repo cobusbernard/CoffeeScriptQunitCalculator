@@ -83,7 +83,7 @@ test( "Invalid operation - round down", function() {
 test( "Remove whitespace and set to upper", function() {
   var validInputs = [
     "1#-SUM:1,2,3,4",
-    "1#SUM: 1, 2, 3, 4",
+    "1#SuM: 1, 2, 3, 4",
     "1#+SUM: 1, 2, 3, 4",
     "1# SUM: 1, 2, 3, 4"
   ]

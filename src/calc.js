@@ -29,7 +29,7 @@
   };
 
   root.stripWhiteSpaceAndChangeToUpper = function(inputString) {
-    return (inputString.replace(/\s+|s+$/g, "")).replace(/\b\#([^a-zA-Z])?\b/g, "#");
+    return (inputString.replace(/\s+|s+$/g, "")).toUpperCase().replace(/\b\#([^a-zA-Z])?\b/g, "#");
   };
 
   root.calculate = function(operator, values) {
