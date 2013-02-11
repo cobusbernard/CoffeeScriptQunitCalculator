@@ -24,12 +24,12 @@
 
   root.validateInput = function(inputString) {
     var validRegex;
-    validRegex = /(\s*\d\s*\#\s*-\s*(\bSUM\b|\bAVERAGE\b|\bMIN\b|\bMAX\b)\s*:(\s*\d+)(,\s*\d+\s*)*)/;
+    validRegex = /(\s*\d\s*\#(\s*.\s*)?(\bSUM\b|\bAVERAGE\b|\bMIN\b|\bMAX\b)\s*:(\s*\d+)(,\s*\d+\s*)*)/;
     return !!inputString && validRegex.test(inputString.toUpperCase());
   };
 
   root.stripWhiteSpaceAndChangeToUpper = function(inputString) {
-    return inputString.replace(/\s+|s+$/g, "");
+    return (inputString.replace(/\s+|s+$/g, "")).replace(/\b\#([^a-zA-Z])?\b/g, "#");
   };
 
   root.calculate = function(operator, values) {
@@ -57,7 +57,7 @@
 
   root.splitRow = function(row) {
     var lineNumber, operator, operatorValues, result, values, _ref, _ref1;
-    _ref = (stripWhiteSpaceAndChangeToUpper(row)).split("#-"), lineNumber = _ref[0], operatorValues = _ref[1];
+    _ref = (stripWhiteSpaceAndChangeToUpper(row)).split("#"), lineNumber = _ref[0], operatorValues = _ref[1];
     _ref1 = operatorValues.split(":"), operator = _ref1[0], values = _ref1[1];
     result = new CalculateRow(lineNumber, operator, values);
     return result;

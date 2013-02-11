@@ -10,7 +10,10 @@ test( "Single row input tests", function() {
     "1#-SUM: 1, 2, 3",
     "1#-SUM: 1 , 2 , 3 ",
     "1#-SUM:1,-2,3",
-    " 1 # - SUM : 1 , 2 , 3 "
+    " 1 # - SUM : 1 , 2 , 3 ",
+    "1#SUM: 1",
+    "1#+SUM: 1",
+    "1# SUM: 1"
   ];
   
   for(var i = 0; i < validInputs.length; i++) 
@@ -72,17 +75,25 @@ test( "AVERAGE operation - round down - negative", function() {
   ok( result == -3, "Passed! [ Expected -3, was " + result + "]");
 });
 
-
 test( "Invalid operation - round down", function() {  
   var result = calculate("AVG", [2, 3, 5]);
   ok( result == -1, "Passed! [ Expected -1, was " + result + "]");
 });
 
 test( "Remove whitespace and set to upper", function() {
-  var result = stripWhiteSpaceAndChangeToUpper("  1 # -	SUM : 1 , 2 , 3 , 4 ");
-  var expected = "1#-SUM:1,2,3,4";  
-  ok( result == expected, 
-    "Passed! [Expected: " + expected + ", was " + result);
+  var validInputs = [
+    "1#-SUM:1,2,3,4",
+    "1#SUM: 1, 2, 3, 4",
+    "1#+SUM: 1, 2, 3, 4",
+    "1# SUM: 1, 2, 3, 4"
+  ]
+  
+  var expected = "1#SUM:1,2,3,4";  
+
+  for(var i = 0; i < validInputs.length; i++) 
+    var result = stripWhiteSpaceAndChangeToUpper(validInputs[i]);
+    ok( result == expected, 
+      "Passed! [Expected: " + expected + ", was " + result);
 });
 
 test( "Split row", function() {
@@ -115,7 +126,7 @@ test( "Parse single row fail", function() {
 });
 
 test( "Parse rows", function() {
-  var result = parseInputText("1#-SUM:1,2,3,4" + "\r\n" + "2#-MIN:4,4,4,4" + "\r\n" + "3#-MAX:3,4,5,6" + "\r\n" + "4#-AVERAGE:2,4,9");
+  var result = parseInputText("1#-SUM:1,2,3,4" + "\r\n" + "2#MIN:4,4,4,4" + "\r\n" + "3# MAX:3,4,5,6" + "\r\n" + "4#-AVERAGE:2,4,9");
   var expected = "1#:SUM=10" + "\r\n" + "2#:MIN=4" + "\r\n" + "3#:MAX=6" + "\r\n" + "4#:AVERAGE=5";
   ok( result == expected, "Passed! [Expected: " + expected + ", was " + result + "]");
 });

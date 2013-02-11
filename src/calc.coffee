@@ -1,6 +1,5 @@
 root = exports ? this
 
-
 class root.CalculateRow
   constructor: (@lineNumber, @operator, values) ->
     @values = []
@@ -12,7 +11,7 @@ root.validateInput = (inputString) ->
   validRegex = /// (
     \s*\d        #Starting number,
     \s*\#        #followed by a hash,
-    \s*-\s*      #and a dash.
+    (\s*.\s*)?  #and a dash (that is optional).
     (\bSUM\b     #The SUM operator
     |\bAVERAGE\b #The AVERAGE operator
     |\bMIN\b     #The MIN operators
@@ -25,7 +24,7 @@ root.validateInput = (inputString) ->
 
 #Removes the whitespace and changes string to uppercase.
 root.stripWhiteSpaceAndChangeToUpper = (inputString) ->
-  return inputString.replace /\s+|s+$/g, ""
+  return (inputString.replace /\s+|s+$/g, "").replace /\b\#([^a-zA-Z])?\b/g, "#"
 
 #Calculates the result based on operator and input values
 root.calculate = (operator, values) ->
@@ -43,7 +42,7 @@ root.buildOutput = (lineNumber, operator, result) ->
 
 #Splits the row into lineNumber, operator and values
 root.splitRow = (row) ->
-  [lineNumber, operatorValues] = (stripWhiteSpaceAndChangeToUpper row).split "#-"
+  [lineNumber, operatorValues] = (stripWhiteSpaceAndChangeToUpper row).split "#"
   [operator, values] = operatorValues.split ":"
   result = new CalculateRow(lineNumber, operator, values)
   return result
