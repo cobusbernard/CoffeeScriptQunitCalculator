@@ -9,6 +9,7 @@ test( "Single row input tests", function() {
     "1#-SUM: 1,2,3",
     "1#-SUM: 1, 2, 3",
     "1#-SUM: 1 , 2 , 3 ",
+    "1#-SUM:1,-2,3",
     " 1 # - SUM : 1 , 2 , 3 "
   ];
   
@@ -21,25 +22,56 @@ test( "SUM operation", function() {
   ok( result == 10, "Passed! [ Expected 10, was " + result + "]");
 });
 
-test( "MIN operation", function() {  
+test( "SUM operation - int overflow", function() {  
+  var result = calculate("SUM", [ Number.MAX_VALUE, 200000]);
+  var expected = Number.MAX_VALUE + 200000;
+  ok( result == expected, "Passed! [ Expected " + expected + ", was " + result + "]");
+});
+
+test( "MIN operation - positive", function() {  
   var result = calculate("MIN", [1, 2, 3, 4]);
   ok( result == 1, "Passed! [ Expected 1, was " + result + "]");
 });
 
-test( "MAX operation", function() {  
+test( "MIN operation - negative", function() {  
+  var result = calculate("MIN", [-1, -2, -3, -4]);
+  ok( result == -4, "Passed! [ Expected -4, was " + result + "]");
+});
+
+test( "MAX operation - positive", function() {  
   var result = calculate("MAX", [1, 2, 3, 4]);
   ok( result == 4, "Passed! [ Expected 4, was " + result + "]");
 });
 
-test( "AVERAGE operation - round up", function() {  
-  var result = calculate("AVERAGE", [1, 2, 3, 4]);
-  ok( result == 3, "Passed! [ Expected 3, was " + result + "]");
+test( "MAX operation - negative", function() {  
+  var result = calculate("MAX", [-1, -2, -3, -4]);
+  ok( result == -1, "Passed! [ Expected -1, was " + result + "]");
 });
 
-test( "AVERAGE operation - round down", function() {  
+test( "AVERAGE operation - round up - positive", function() {  
+  var result = calculate("AVERAGE", [1, 2, 3, 4]);
+  ok( result == 3, "Passed! [ Expected 3, was " + result + "]");
+  result = calculate("AVERAGE", [2,4,9]);
+  ok( result == 5, "Passed! [ Expected 5, was " + result + "]");
+});
+
+test( "AVERAGE operation - round down - positive", function() {  
   var result = calculate("AVERAGE", [2, 3, 5]);
   ok( result == 3, "Passed! [ Expected 3, was " + result + "]");
 });
+
+test( "AVERAGE operation - round up - negative", function() {  
+  var result = calculate("AVERAGE", [-1, -2, -3, -4]);
+  ok( result == -2, "Passed! [ Expected -2, was " + result + "]");
+  result = calculate("AVERAGE", [-2,-4,-9]);
+  ok( result == -5, "Passed! [ Expected -5, was " + result + "]");
+});
+
+test( "AVERAGE operation - round down - negative", function() {  
+  var result = calculate("AVERAGE", [-2, -3, -5]);
+  ok( result == -3, "Passed! [ Expected -3, was " + result + "]");
+});
+
 
 test( "Invalid operation - round down", function() {  
   var result = calculate("AVG", [2, 3, 5]);
@@ -83,8 +115,8 @@ test( "Parse single row fail", function() {
 });
 
 test( "Parse rows", function() {
-  var result = parseInputText("1#-SUM:1,2,3,4" + "\r\n" + "2#-SUM:4,4,4,4" + "\r\n" + "3#-SUM:3,4,5,6");
-  var expected = "1#:SUM=10" + "\r\n" + "2#:SUM=16" + "\r\n" + "3#:SUM=18";
+  var result = parseInputText("1#-SUM:1,2,3,4" + "\r\n" + "2#-MIN:4,4,4,4" + "\r\n" + "3#-MAX:3,4,5,6" + "\r\n" + "4#-AVERAGE:2,4,9");
+  var expected = "1#:SUM=10" + "\r\n" + "2#:MIN=4" + "\r\n" + "3#:MAX=6" + "\r\n" + "4#:AVERAGE=5";
   ok( result == expected, "Passed! [Expected: " + expected + ", was " + result + "]");
 });
 
@@ -97,6 +129,12 @@ test( "Parse rows fail", function() {
 test( "Garbage input", function() {
   var result = parseInputText("asdfsd23432f:asdf:Adsf");
   var expected = "Could not parse. [ asdfsd23432f:asdf:Adsf ]";
+  ok( result == expected, "Passed! [Expected: " + expected + ", was " + result + "]");
+});
+
+test( "Empty input", function() {
+  var result = parseInputText("");
+  var expected = "Could not parse. [  ]";
   ok( result == expected, "Passed! [Expected: " + expected + ", was " + result + "]");
 });
 
@@ -134,10 +172,3 @@ test( "Performance test - Reduce vs Apply", function() {
 
   ok( rMin == aMin, "Passed! [Reduce: " + rDuration + "ms, Apply: " + aDuration + "ms]");
 });
-
-
-
-/*
-test( "", function() {  
-});
-*/

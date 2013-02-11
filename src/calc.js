@@ -7,9 +7,15 @@
   root.CalculateRow = (function() {
 
     function CalculateRow(lineNumber, operator, values) {
+      var value, _i, _len, _ref;
       this.lineNumber = lineNumber;
       this.operator = operator;
-      this.values = values.split(",");
+      this.values = [];
+      _ref = values.split(",");
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        value = _ref[_i];
+        this.values.push(parseInt(value));
+      }
     }
 
     return CalculateRow;
@@ -30,7 +36,7 @@
     switch (operator) {
       case "SUM":
         return values.reduce(function(t, s) {
-          return +t + +s;
+          return t + s;
         });
       case "MIN":
         return Math.min.apply(this, values);

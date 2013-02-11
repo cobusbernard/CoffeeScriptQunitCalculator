@@ -3,7 +3,9 @@ root = exports ? this
 
 class root.CalculateRow
   constructor: (@lineNumber, @operator, values) ->
-    @values = values.split ","
+    @values = []
+    for value in (values.split ",")
+      @values.push parseInt value
 
 #Sets text to uppercase and tries to validate the input pattern.
 root.validateInput = (inputString) -> 
@@ -28,7 +30,7 @@ root.stripWhiteSpaceAndChangeToUpper = (inputString) ->
 #Calculates the result based on operator and input values
 root.calculate = (operator, values) ->
   switch(operator)
-    when "SUM" then values.reduce (t, s) -> +t + +s
+    when "SUM" then values.reduce (t, s) -> t + s
     when "MIN" then Math.min.apply(this, values)
     when "MAX" then Math.max.apply(this, values)
     when "AVERAGE" then Math.round((values.reduce (t, s) -> t += s) / values.length)
