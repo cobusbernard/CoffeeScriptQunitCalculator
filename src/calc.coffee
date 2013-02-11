@@ -62,3 +62,7 @@ root.parseInputText = (inputString) ->
 
   output = (parseRow row for row in rows).reduce (t, s) -> t + "\r\n" + s
 
+#Sets the given text on the div
+root.parseInput = (inputDivName, outputDivName) ->
+   inputString = (root.document.getElementById inputDivName).value
+   (root.document.getElementById outputDivName).value = (root.parseInputText inputString)

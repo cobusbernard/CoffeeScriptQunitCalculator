@@ -90,4 +90,10 @@
     });
   };
 
+  root.parseInput = function(inputDivName, outputDivName) {
+    var inputString;
+    inputString = (root.document.getElementById(inputDivName)).value;
+    return (root.document.getElementById(outputDivName)).value = root.parseInputText(inputString);
+  };
+
 }).call(this);
