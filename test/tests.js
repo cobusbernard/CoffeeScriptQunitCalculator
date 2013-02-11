@@ -126,8 +126,12 @@ test( "Parse single row fail", function() {
 });
 
 test( "Parse rows", function() {
-  var result = parseInputText("1#-SUM:1,2,3,4" + "\r\n" + "2#MIN:4,4,4,4" + "\r\n" + "3# MAX:3,4,5,6" + "\r\n" + "4#-AVERAGE:2,4,9");
-  var expected = "1#:SUM=10" + "\r\n" + "2#:MIN=4" + "\r\n" + "3#:MAX=6" + "\r\n" + "4#:AVERAGE=5";
+  var result = parseInputText("1#-SUM:1,2,3,4" 
+    + "\r\n" + "2#MIN:4,4,4,4" 
+    + "\r\n" + "3# MAX:3,-4,5,6" 
+    + "\r\n" + "4#-AVERAGE:2,4,9" 
+    + "\r\n" + "5#-AVERAGE:-3,2,9");
+  var expected = "1#:SUM=10" + "\r\n" + "2#:MIN=4" + "\r\n" + "3#:MAX=6" + "\r\n" + "4#:AVERAGE=5" + "\r\n" + "5#:AVERAGE=3";
   ok( result == expected, "Passed! [Expected: " + expected + ", was " + result + "]");
 });
 

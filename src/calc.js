@@ -24,7 +24,7 @@
 
   root.validateInput = function(inputString) {
     var validRegex;
-    validRegex = /(\s*\d\s*\#(\s*.\s*)?(\bSUM\b|\bAVERAGE\b|\bMIN\b|\bMAX\b)\s*:(\s*\d+)(,\s*\d+\s*)*)/;
+    validRegex = /(\s*\d\s*\#(\s*.\s*)?(\bSUM\b|\bAVERAGE\b|\bMIN\b|\bMAX\b)\s*:(\s*\-?\d+)(,\s*\d+\s*)*)/;
     return !!inputString && validRegex.test(inputString.toUpperCase());
   };
 

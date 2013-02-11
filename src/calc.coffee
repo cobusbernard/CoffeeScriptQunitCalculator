@@ -17,7 +17,7 @@ root.validateInput = (inputString) ->
     |\bMIN\b     #The MIN operators
     |\bMAX\b)    #The MAX operator
     \s*:         #Colon between the operator and input list
-    (\s*\d+)(,\s*\d+\s*)* #Comma seperated integer list
+    (\s*\-?\d+)(,\s*\d+\s*)* #Comma seperated integer list
     )
   ///
   return (!!inputString && validRegex.test(inputString.toUpperCase()))
